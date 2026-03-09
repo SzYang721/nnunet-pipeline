@@ -1,0 +1,14 @@
+# 忽略logs目录
+logs/
+
+# Python常见忽略项
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.env
+*.egg-info/
+*.log
+*.sqlite3
+.DS_Store 
