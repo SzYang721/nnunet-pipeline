@@ -1,82 +1,85 @@
 # nnunet-pipeline
 
-基于 **nnU-Net v2** 的 research 训练与推理脚本，支持：
+[![English](https://img.shields.io/badge/README-English-blue)](README.md)
+[![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-brightgreen)](README.zh-CN.md)
 
-- **训练**：`nnUNetv2_plan_and_preprocess` + `nnUNetv2_train`
-- **推理**：自定义推理 / 自动 best configuration（解析 `inference_instructions.txt`，支持 single/ensemble）
-- **cascade**：当配置需要时，运行时自动为 `nnUNetv2_predict` 追加 `-prev_stage_predictions`
+Research training & inference scripts based on **nnU-Net v2**, supporting:
+
+- **Training**: `nnUNetv2_plan_and_preprocess` + `nnUNetv2_train`
+- **Inference**: custom inference / automatic best configuration (parses `inference_instructions.txt`, supports single/ensemble)
+- **Cascade**: when required by configuration, automatically appends `-prev_stage_predictions` to `nnUNetv2_predict` at runtime
 
 ---
 
-## 快速开始（Fork 后直接运行）
+## Quick start (run after forking)
 
-1. **克隆并进入仓库**
+1. **Clone the repo**
    ```bash
-   git clone https://github.com/<你的用户名>/nnunet-pipeline.git
+   git clone https://github.com/<your-username>/nnunet-pipeline.git
    cd nnunet-pipeline
    ```
 
-2. **创建环境并安装依赖**
+2. **Create an environment and install dependencies**
    ```bash
    conda create -n nnunet_env python=3.11 -y
    conda activate nnunet_env
    pip install -r requirements.txt
    ```
-   > PyTorch/CUDA 请按本机版本单独安装（如 `pip install torch` 或 conda）。
+   > Install PyTorch/CUDA separately according to your machine (e.g. `pip install torch` or via conda).
 
-3. **安装 nnU-Net v2**（若尚未安装）
+3. **Install nnU-Net v2** (if not installed yet)
    ```bash
    pip install nnunetv2
    ```
 
-4. **配置 nnU-Net 数据路径（必须）**  
-   在 `train_with_nnUNet.py` 和 `predict_with_nnUNet.py` 开头修改这三行为你自己的路径：
+4. **Configure nnU-Net data paths (required)**  
+   Edit the following three lines near the top of `train_with_nnUNet.py` and `predict_with_nnUNet.py` to match your paths:
    ```python
    os.environ['nnUNet_raw'] = "/your/path/to/nnUNet_raw"
    os.environ['nnUNet_preprocessed'] = "/your/path/to/nnUNet_preprocessed"
    os.environ['nnUNet_results'] = "/your/path/to/nnUNet_results"
    ```
-   或使用环境变量：运行前 `export nnUNet_raw=... nnUNet_preprocessed=... nnUNet_results=...`。
+   Or use environment variables: `export nnUNet_raw=... nnUNet_preprocessed=... nnUNet_results=...` before running.
 
-5. **运行方式**  
-   脚本使用相对导入，需以包形式运行。仓库内已包含 `__init__.py`。请将仓库目录命名为合法 Python 包名（如 `nnunet_pipeline`），然后在其**上一级目录**执行：
+5. **How to run**  
+   These scripts use relative imports, so you should run them as a Python package (`python -m ...`). This repo already includes `__init__.py`. Rename the repo folder to a valid Python package name (e.g. `nnunet_pipeline`), then run commands from the **parent directory**:
    ```bash
-   # 克隆时可直接指定目录名（避免连字符）
-   git clone https://github.com/<你的用户名>/nnunet-pipeline.git nnunet_pipeline
+   # Clone with a valid directory name (avoid hyphens)
+   git clone https://github.com/<your-username>/nnunet-pipeline.git nnunet_pipeline
    cd nnunet_pipeline
-   # ... 安装依赖、配置路径后 ...
+   # ... after installing deps and setting paths ...
    cd ..
    python -m nnunet_pipeline.train_with_nnUNet -d Dataset038_Spine_Fracture --plan_only
    python -m nnunet_pipeline.predict_with_nnUNet --task Dataset038_Spine_Fracture --input_folder ... --output_folder ... --use_best_config
    ```
-   若将本仓库放在 `code/train_code/` 下，则 `cd code` 后执行 `python -m train_code.train_with_nnUNet ...` 即可。
+   If you place this repo under `code/train_code/`, then run `python -m train_code.train_with_nnUNet ...` after `cd code`.
 
 ---
 
-## 环境与依赖
+## Environment & dependencies
 
-### 1) 创建环境
+### 1) Create an environment
 
-推荐使用你已有的 `nnunet_env`，或新建一个 Python 3.11 环境：
+You can reuse an existing `nnunet_env`, or create a new Python 3.11 environment:
 
 ```bash
 conda create -n nnunet_env python=3.11 -y
 conda activate nnunet_env
 ```
 
-### 2) 安装依赖
+### 2) Install dependencies
 
-仓库根目录提供 `requirements.txt`（已排除 nvidia-*，便于跨 CUDA 环境安装）。
+This repo provides `requirements.txt` (excluding `nvidia-*` for easier installation across different CUDA setups).
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> PyTorch/CUDA 建议按你机器与 CUDA 版本单独安装（例如使用官方 wheel/conda）。
+> It is recommended to install PyTorch/CUDA separately based on your machine/CUDA version (e.g. official wheels/conda).
 
-### 3) 安装/确认 nnU-Net v2
+### 3) Install/verify nnU-Net v2
 
-确认已安装 `nnunetv2` 且命令可用：
+Make sure `nnunetv2` is installed and the CLI commands are available:
 
 ```bash
 nnUNetv2_predict -h
@@ -86,20 +89,20 @@ nnUNetv2_find_best_configuration -h
 
 ---
 
-## nnU-Net 路径（必须）
+## nnU-Net paths (required)
 
-nnU-Net v2 依赖以下环境变量定位数据与结果目录：
+nnU-Net v2 uses the following environment variables to locate data and results:
 
 - `nnUNet_raw`
 - `nnUNet_preprocessed`
 - `nnUNet_results`
 
-**建议**：将上述路径直接写入脚本顶部，便于固定环境、避免每次 export。
+**Recommendation**: hardcode these paths at the top of the scripts to keep the environment consistent and avoid exporting every time.
 
-- **训练**：在 `train_with_nnUNet.py` 文件开头找到 `os.environ["nnUNet_raw"]` 等三行，改为你自己的路径。
-- **推理**：在 `predict_with_nnUNet.py` 文件开头同样修改三处路径。
+- **Training**: in `train_with_nnUNet.py`, update the three `os.environ["nnUNet_raw"]`-like lines near the top.
+- **Inference**: in `predict_with_nnUNet.py`, update the same three lines.
 
-若希望用环境变量，也可在运行前执行：
+If you prefer environment variables, run before execution:
 
 ```bash
 export nnUNet_raw=/path/to/nnUNet_raw
@@ -109,25 +112,25 @@ export nnUNet_results=/path/to/nnUNet_results
 
 ---
 
-## 配置文件
+## Config files
 
 - `configs/train_config.py`
-  - `TRAIN_DATASET_CONFIGS`：每个 dataset 的训练配置（configurations/folds/train_args）
+  - `TRAIN_DATASET_CONFIGS`: per-dataset training configs (configurations/folds/train_args)
 - `configs/predict_data_config.py`
-  - `PREDICT_CONFIGS`：每个 dataset 的推理默认路径与参数（input/output/model/fold/file_type 等）
+  - `PREDICT_CONFIGS`: per-dataset default inference paths and parameters (input/output/model/fold/file_type, etc.)
 
-脚本支持：**config 作为默认值，命令行参数覆盖 config**。
+These scripts support: **config provides defaults, CLI args override config**.
 
 ---
 
-## 训练（train_with_nnUNet）
+## Training (`train_with_nnUNet`)
 
-入口：`train_with_nnUNet.py`
+Entry: `train_with_nnUNet.py`
 
-### 1) 只做 plan & preprocess
+### 1) Plan & preprocess only
 
 ```bash
-cd /path/to/code   # 或仓库上一级（若以 nnunet_pipeline 包运行）
+cd /path/to/code   # or the parent dir if using the `nnunet_pipeline` package name
 conda activate nnunet_env
 
 python -m train_code.train_with_nnUNet \
@@ -135,9 +138,9 @@ python -m train_code.train_with_nnUNet \
   --plan_only
 ```
 
-### 2) 只做训练（跳过 plan）
+### 2) Train only (skip plan)
 
-适用于你已经完成 preprocessing 的场景：
+Use this when preprocessing has already been done:
 
 ```bash
 cd /path/to/code
@@ -150,12 +153,12 @@ python -m train_code.train_with_nnUNet \
   -f 0
 ```
 
-### 3) 多 fold / 多 trainer / 多 plans
+### 3) Multiple folds / trainers / plans
 
-- `-f/--folds` 支持多个 fold
-- `-tr/--trainer`、`-p/--plans` 支持多个值，会做 trainer×plans 组合训练
+- `-f/--folds` supports multiple folds
+- `-tr/--trainer` and `-p/--plans` accept multiple values and will run the Cartesian product (trainer × plans)
 
-示例：
+Example:
 
 ```bash
 python -m train_code.train_with_nnUNet \
@@ -169,17 +172,17 @@ python -m train_code.train_with_nnUNet \
 
 ---
 
-## 推理（predict_with_nnUNet）
+## Inference (`predict_with_nnUNet`)
 
-入口：`predict_with_nnUNet.py`
+Entry: `predict_with_nnUNet.py`
 
-### 模式 A：best configuration（推荐）
+### Mode A: best configuration (recommended)
 
-该模式会读取/生成 `nnUNet_results/DatasetXXX_*/inference_instructions.txt`，并按顺序执行：
+This mode reads/generates `nnUNet_results/DatasetXXX_*/inference_instructions.txt` and executes in order:
 
 - one or more `nnUNetv2_predict`
-- 如果 best 是 ensemble：额外执行 `nnUNetv2_ensemble`（并自动为 predict 命令补 `--save_probabilities`）
-- 最后执行 `nnUNetv2_apply_postprocessing`
+- If the best is an ensemble: additionally runs `nnUNetv2_ensemble` (and automatically adds `--save_probabilities` to predict commands)
+- Finally runs `nnUNetv2_apply_postprocessing`
 
 ```bash
 cd /path/to/code
@@ -195,7 +198,7 @@ python -m train_code.predict_with_nnUNet \
   --npp 3 --nps 3
 ```
 
-### 模式 B：自定义推理（手动指定模型参数）
+### Mode B: custom inference (manually specify model params)
 
 ```bash
 python -m train_code.predict_with_nnUNet \
@@ -210,9 +213,9 @@ python -m train_code.predict_with_nnUNet \
   --npp 3 --nps 3
 ```
 
-### cascade 推理（需要前一阶段预测）
+### Cascade inference (requires previous stage predictions)
 
-如果配置为 `3d_cascade_fullres`（或命令需要 prev_stage），请提供 `--prev_stage_predictions`：
+If using `3d_cascade_fullres` (or if the command requires a previous stage), provide `--prev_stage_predictions`:
 
 ```bash
 python -m train_code.predict_with_nnUNet \
@@ -227,41 +230,37 @@ python -m train_code.predict_with_nnUNet \
 
 ---
 
-## 输入数据格式约定
+## Input data naming convention
 
-推理输入目录下需要存在 `*_0000.<ext>` 文件（例如 `case_0000.nrrd`）。
+The inference input folder must contain `*_0000.<ext>` files (e.g. `case_0000.nrrd`).
 
-- `--file_type nrrd` 会在输入目录中匹配 `*_0000.nrrd`
+- With `--file_type nrrd`, the script matches `*_0000.nrrd` in the input folder.
 
 ---
 
-## 常见问题
+## FAQ
 
-### 1) 为什么建议用 `python -m ...`？
+### How is the best configuration chosen?
 
-本仓库脚本使用了相对导入（例如 `from .utils...`），以包形式运行（`python -m nnunet_pipeline.xxx` 或 `python -m train_code.xxx`）可避免导入失败。
-
-### 2) best configuration 如何决定？
-
-由 `nnUNetv2_find_best_configuration` 基于交叉验证结果（Dice）选择最佳 single/ensemble，并生成 `inference_instructions.txt`。
+`nnUNetv2_find_best_configuration` selects the best single/ensemble based on cross-validation results (Dice) and generates `inference_instructions.txt`.
 
 ---
 
 ## Citation
 
-若使用本代码或 nnU-Net 进行实验，请引用：
+If you use this code or nnU-Net in your research, please cite:
 
 > Isensee, F., Jaeger, P. F., Kohl, S. A., Petersen, J., & Maier-Hein, K. H. (2021). nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. *Nature methods*, 18(2), 203-211.
 
 ---
 
-## 文件索引
+## File index
 
-- `train_with_nnUNet.py`：训练入口（plan/preprocess + train）
-- `predict_with_nnUNet.py`：推理入口（best config / custom）
-- `utils/train_utils.py`：训练命令构建与参数解析
-- `utils/predict_utils.py`：instructions 解析、命令构建（ensemble/cascade 支持）
-- `utils/run_utils.py`：输出监控进度条
-- `configs/train_config.py`：训练配置
-- `configs/predict_data_config.py`：推理配置
+- `train_with_nnUNet.py`: training entry (plan/preprocess + train)
+- `predict_with_nnUNet.py`: inference entry (best config / custom)
+- `utils/train_utils.py`: training command building & arg parsing
+- `utils/predict_utils.py`: instruction parsing & command building (ensemble/cascade support)
+- `utils/run_utils.py`: output monitor progress bar
+- `configs/train_config.py`: training config
+- `configs/predict_data_config.py`: inference config
 
